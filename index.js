@@ -14,6 +14,7 @@ app.use(cors())
 //CONFIGURALÇOES DO MONGODB
 const user_name = process.env.USER_NAME
 const password = process.env.PASSWORD
+const port = process.env.PORT || 3000
 
 //MODELO DO OBJETO DO BANCO DE DADOS
 const Person = mongoose.model('Person', {
@@ -91,6 +92,7 @@ const Vehicle = mongoose.model('Vehicle', {
     },
 });
 
+//ROTA DE TESTE PARA VER SE O SERVIDOR ESTÁ FUNCIONANDO
 app.get('/', async (req, res) => {
     return res.send('Teste de rota, rota funcionando!')
 })
@@ -125,15 +127,16 @@ app.get('/vehicles', async (req, res) => {
     }
 })
 
+//FA A CONEXAO COM O BANCO DE DADOS E INICIA O SERVIDOR 
 mongoose.connect(`mongodb+srv://${user_name}:${password}@cluster0.lflwc8k.mongodb.net/?appName=Cluster0`)
 .then(() => {
     console.log("✅ Conectado ao servidor (MongoDB)")
 
-    app.listen(process.env.PORT || 3000, () => {
-    console.log(`🚀 Servidor rodando na porta ${process.env.PORT || 3000}`)
+    app.listen(port, () => {
+    console.log(`🚀 Servidor rodando na porta ${port}`)
     })
 })
 .catch((error) => {
-    console.error("❌ Erro ao tentar se conectar ao MongoDB")
+    console.error("Erro ao tentar se conectar ao MongoDB")
     console.error(error)
 })
