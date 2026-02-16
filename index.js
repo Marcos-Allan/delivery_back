@@ -110,6 +110,21 @@ app.get('/employees', async (req, res) => {
     }
 })
 
+//LISTA TODOS OS USUÁRIOS DO BANCO DE DADOS
+app.get('/vehicles', async (req, res) => {
+    //PROCURA NO BANCO DE DADOS POR TODOS OS USUÁRIOS CADASTRADOS
+    const vehicles = await Vehicle.find()
+
+    //VERIFICA SE O ARRAY DE USUÁRIOS ESTÁ VAZIO
+    if(vehicles.length === 0) {
+        //VERIFICA SE TEM ALGUM USUÁRIO CADASTRADO, SE NÃO TIVER RETORNA MENSAGEM DE FEEDBACK
+        return res.send("Nenhum veículo encontrado")
+    }else{
+        //RETORNA OS DADOS PARA FEEDBACK DO USUÁRIO
+        return res.send(vehicles)
+    }
+})
+
 mongoose.connect(`mongodb+srv://${user_name}:${password}@cluster0.lflwc8k.mongodb.net/?appName=Cluster0`)
 .then(() => {
     console.log("✅ Conectado ao servidor (MongoDB)")
