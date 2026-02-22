@@ -1,2 +1,2 @@
 # delivery_back
-Bakcned of Delivery App of the Lavanderia Brilhante
+Backend of Delivery App of the Lavanderia Brilhante
