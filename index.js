@@ -165,6 +165,27 @@ app.post('/register-employee', async (req, res) => {
     }
 })
 
+//ROTA PARA DELETAR USUÁRIOS DO BANCO DE DADOS
+app.delete('/delete-employee/:id', async (req, res ) => {
+    //PEGA O ID DO USUÁRIO ENVIADO PELA URL
+    const id  = req.params.id
+
+    //VERIFICASE A PESSOA EXISTENO BANCO DE DADOS
+    const personExist = await Person.findById(id)
+
+    //VERIFICA SE personExist É VERDDADEIRO  OU FALSO
+    if(!personExist) {
+        //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
+        return res.send("Funcionário não encontrado")
+    } else {
+        //DELETA O USUÁRIO DO BANCO DE DADOS
+        await Person.findByIdAndDelete(id)
+
+        //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
+        return res.send(`Funcionário ${personExist.name} deletado com sucesso!`)   
+    }
+})
+
 //LISTA TODOS OS VEICULOS DO BANCO DE DADOS
 app.get('/vehicles', async (req, res) => {
     //PROCURA NO BANCO DE DADOS POR TODOS OS VEICULOS CADASTRADOS
@@ -210,6 +231,26 @@ app.post('/register-vehicle', async (req, res) => {
 
         //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
         return res.send(`Veículo com placa ${license_plate}, cadastrado com sucesso!`)
+    }
+})
+
+//rROTA PARA DELETAR VEICULOS NO BANCO DE DADOS
+app.delete('/delete-cehicle/:id', async (req, res) => {
+    //PEGA O ID DO CEÍCULO DA URL
+    const id = req.params.id
+
+    //VARIAVEL DE CONTROLE PARA VER SE O VECULO EXISTE NO BANCO DE DADOS 
+    const vehicleExist = await Vehicle.findById(id)
+
+    //VERIFICA SE O VEICULO ESTÁ CADASTRADO NO BANCO DE DADOS
+    if(!vehicleExist) {
+        //MOSTRA MENSAGE DE FEEDBACK PARA O USUÁRIO
+        return res.json("Veículo não encontrado")
+    } else {
+        //PROCURA PELO VEICULO NO BANCO DE DADOS E O EXCLUI 
+        await Vehicle.findByIdAndDelete(id)
+        //MOSTRA MENSAGE DE FEEDBACK PARA O USUÁRIO
+        return res.json("Veículo deletado com sucesso!")        
     }
 })
 
@@ -284,6 +325,24 @@ app.post('/register-order', async (req, res) => {
     return res.send(`Pedido do cliente ${client}, cadastrado com sucesso!`)
 })
 
+//ROTA PARA DELETAR PEDIDOS  NO BANCO DE DADOS
+app.delete('/delete-order/:id', async (req, res) => {
+    //PEGA O ID DA PELA URL
+    const id = req.params.id
+
+    //VARIAVEL DE CONTROLE PARA VER SE O PEDIDO EXISTE NO BANCO DE DADOS
+    const orderExist = await Order.findById(id)
+
+    if(!orderExist) {
+        //MOSTRA MENSAGEM DE ERRO PARA O USUÁRIO
+        return res.send("Pedido não encontrado")
+    }else {
+        await Order.findByIdAndDelete(id)
+        //MOSTRA MENSAGEM DE FEEDBACK PARAO USUÁRIO
+        return res.send(`Pedido do cliente ${orderExist.name}, deletado com sucesso!`)
+    }
+})
+
 //LISTA TODAS AS ENTREGAS DO BANCO DE DADOS
 app.get('/invoices', async (req, res) => {
     //PROCURA NO BANCO DE DADOS POR TODOS OS VEICULOS CADASTRADOS
@@ -326,7 +385,26 @@ app.post('/register-invoice', async (req, res) => {
     await invoice.save()
 
     //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-    return res.send(`Nota fiscal do cliente ${delivery_person_name}, cadastrada com sucesso!`)
+    return res.send(`Nota fisca
+        
+        l do cliente ${delivery_person_name}, cadastrada com sucesso!`)
+})
+
+//ROTA PARA DELETAR AS ENTREGAS DO BANCO DE DADOS
+app.delete('/delete-invoice/:id', async (req, res) => {
+    //PEGA O ID DA NOTA FISCAL PELA URL
+    const id = req.params.id
+
+    //VARIAVEL DE CONTROLE PARA VER SE A NOTA FISCAL EXISTE NO BANCO DE DADOS
+    const invoiceExist = await Invoice.findById(id)
+
+    if(!invoiceExist) {
+        return res.json("Nota fiscal não encontrada!")
+    }  else {
+        await Invoice.findByIdAndDelete(id)
+        return res.json(`Nota fiscal do  cliente ${invoiceExist.delivery_person_name}, deletada xom sucessso!!!`)
+    }
+  
 })
 
 //FAZ A CONEXAO COM O BANCO DE DADOS E INICIA O SERVIDOR 
