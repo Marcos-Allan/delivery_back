@@ -38,6 +38,10 @@ const Order = mongoose.model('Order', {
         type: String,
         required: true
     },
+    address: {
+        type: String,
+        required: true
+    },
     client: {
         type: String,
         required: true
@@ -51,6 +55,10 @@ const Order = mongoose.model('Order', {
         required: true
     },
     description: {
+        type: String,
+        required: true
+    }, 
+    type_delivery: {
         type: String,
         required: true
     }
@@ -83,6 +91,10 @@ const Invoice = mongoose.model('Invoice', {
         required: true
     },
     license_plate: {
+        type: String,
+        required: true
+    },
+    type_delivery: {
         type: String,
         required: true
     }
@@ -127,19 +139,19 @@ app.post('/register-employee', async (req, res) => {
     //VERIFICA SE O USUÁRIO ENVIOU O NOME DO FUNCIONÁRIO
     if(!name) {
         //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-        return res.send("Informe um nome")
+        return res.send({ type: "error", message: "Informe um nome" })
     }
 
     //VERIFICA SE O CARGO DO FUNCIONÁRIO FOI ENVIADO
     if(!position) {
         //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-        return res.send("Informe o cargo do funcionário")
+        return res.send({ type: "error", message: "Informe o cargo do funcionário"} )
     }
 
     //VERIFICA SE O GÊNERO DO FUNCIONÁRIO FOI ENVIADO
     if(!gender) {
         //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-        return res.send("Informe o gênero do funcionário")
+        return res.send({ type: "error", message: "Informe o gênero do funcionário" })
     }
 
     //VERIFICA SE O FUNCIONÁRIO FOI CADASTRADO NO BANCO DE DADOS RETORNANDO TRUE OU FALSE
@@ -148,7 +160,7 @@ app.post('/register-employee', async (req, res) => {
     //VERIFICA SE personExist É TRUE, SE FOR RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO, SE NÃO FOR CRIA UM NOVO USUÁRIO NO BANCO DE DADOS
     if(personExist) {
         //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-        return res.send("Funcionário já cadastrado")
+        return res.send({ type: "error", message: "Funcionário já cadastrado" })
     }else {
         //CRIA UM NOVO FUNCIONNÁRIO NO BANCO DE DADOS
         const person = new Person({
@@ -161,7 +173,7 @@ app.post('/register-employee', async (req, res) => {
         await person.save()
 
         //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-        return res.send(`Funcionári${String(gender).toLowerCase() === "masculino"  ? 'o' : 'a'} ${name}, cadastrado com sucesso!`)
+        return res.send({ type: "success", message: `Funcionári${String(gender).toLowerCase() === "masculino"  ? 'o' : 'a'} ${name}, cadastrado com sucesso!` })
     }
 })
 
@@ -176,13 +188,13 @@ app.delete('/delete-employee/:id', async (req, res ) => {
     //VERIFICA SE personExist É VERDDADEIRO  OU FALSO
     if(!personExist) {
         //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-        return res.send("Funcionário não encontrado")
+        return res.send({ type: "error", message: "Funcionário não encontrado" })
     } else {
         //DELETA O USUÁRIO DO BANCO DE DADOS
         await Person.findByIdAndDelete(id)
 
         //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-        return res.send(`Funcionário ${personExist.name} deletado com sucesso!`)   
+        return res.send({ type: "success", message: `Funcionári${String(personExist.gender).toLowerCase() === "masculino" ? 'o' : 'a'} ${personExist.name} deletado com sucesso!` })   
     }
 })
 
@@ -210,7 +222,7 @@ app.post('/register-vehicle', async (req, res) => {
     //VERIFICA SE O USUÁRIO ENVIOU A PLACA DO VEÍCULO
     if(!license_plate) {
         //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-        return res.send("Informe a placa do veículo")
+        return res.send({ type: "error", message: "Informe a placa do veículo" })
     }
 
     //VERIFICA SE O VEÍCULO FOI CADASTRADO NO BANCO DE DADOS RETORNANDO TRUE OU FALSE
@@ -219,7 +231,7 @@ app.post('/register-vehicle', async (req, res) => {
     //VERIFICA SE vehicleExist É TRUE, SE FOR RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO, SE NÃO FOR CRIA UM NOVO VEÍCULO NO BANCO DE DADOS
     if(vehicleExist) {
         //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-        return res.send("Veículo já cadastrado")
+        return res.send({ type: "error", message: "Veículo já cadastrado" })
     }else {
         //CRIA UM NOVO VEÍCULO NO BANCO DE DADOS
         const vehicle = new Vehicle({
@@ -230,12 +242,12 @@ app.post('/register-vehicle', async (req, res) => {
         await vehicle.save()
 
         //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-        return res.send(`Veículo com placa ${license_plate}, cadastrado com sucesso!`)
+        return res.send({ type: "success", message: `Veículo com placa ${license_plate}, cadastrado com sucesso!` })
     }
 })
 
 //rROTA PARA DELETAR VEICULOS NO BANCO DE DADOS
-app.delete('/delete-cehicle/:id', async (req, res) => {
+app.delete('/delete-vehicle/:id', async (req, res) => {
     //PEGA O ID DO CEÍCULO DA URL
     const id = req.params.id
 
@@ -245,12 +257,12 @@ app.delete('/delete-cehicle/:id', async (req, res) => {
     //VERIFICA SE O VEICULO ESTÁ CADASTRADO NO BANCO DE DADOS
     if(!vehicleExist) {
         //MOSTRA MENSAGE DE FEEDBACK PARA O USUÁRIO
-        return res.json("Veículo não encontrado")
+        return res.send({ type: "error", message: "Veículo não encontrado" })
     } else {
         //PROCURA PELO VEICULO NO BANCO DE DADOS E O EXCLUI 
         await Vehicle.findByIdAndDelete(id)
         //MOSTRA MENSAGE DE FEEDBACK PARA O USUÁRIO
-        return res.json("Veículo deletado com sucesso!")        
+        return res.send({ type: "success", message: `Veículo com a placa ${vehicleExist.license_plate} deletado com sucesso!` })        
     }
 })
 
