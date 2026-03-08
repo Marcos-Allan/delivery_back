@@ -198,6 +198,36 @@ app.delete('/delete-employee/:id', async (req, res ) => {
     }
 })
 
+//ROTA PARA ATUALIZAR USUÁRIOS DO BANCO DE DADOS
+app.put('/update-employee/:id', async (req, res) => {
+    //PEGA O ID DO USUÁRIO ENVIADO PELA URL
+    const id  = req.params.id
+
+    //PEGA OS DADOS ENVIADOS POR REQUISISAO PELO USUÁRIO 
+    const name = req.body.name
+    const position = req.body.position
+    const gender = req.body.gender
+
+    //VERIFICASE A PESSOA EXISTENO BANCO DE DADOS
+    const personExist = await Person.findById(id)
+
+    //VERIFICA SE personExist É VERDDADEIRO  OU FALSO
+    if(!personExist) {
+        //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
+        return res.send({ type: "error", message: "Funcionário não encontrado" })
+    } else {
+        //ATUALIZA O USUÁRIO DO BANCO DE DADOS
+        await Person.findByIdAndUpdate(id, {
+            name: name ? name : personExist.name,
+            position: position ? position : personExist.position,
+            gender: gender ? gender : personExist.gender
+        })
+
+        //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
+        return res.send({ type: "success", message: `Funcionári${String(gender).toLowerCase() === "masculino" ? 'o' : 'a'} ${name} atualizado com sucesso!` })
+    }
+})
+
 //LISTA TODOS OS VEICULOS DO BANCO DE DADOS
 app.get('/vehicles', async (req, res) => {
     //PROCURA NO BANCO DE DADOS POR TODOS OS VEICULOS CADASTRADOS
@@ -263,6 +293,31 @@ app.delete('/delete-vehicle/:id', async (req, res) => {
         await Vehicle.findByIdAndDelete(id)
         //MOSTRA MENSAGE DE FEEDBACK PARA O USUÁRIO
         return res.send({ type: "success", message: `Veículo com a placa ${vehicleExist.license_plate} deletado com sucesso!` })        
+    }
+})
+
+//ROTA PARA ATUALIZAR VEICULOS NO BANCO DE DADOS
+app.put('/update-vehicle/:id', async (req, res) => {
+    //PEGA O ID DO CEÍCULO DA URL
+    const id = req.params.id
+
+    //PEGA OS DADOS ENVIADOS POR REQUISISAO PELO USUÁRIO 
+    const license_plate = req.body.license_plate
+
+    //VARIAVEL DE CONTROLE PARA VER SE O VECULO EXISTE NO BANCO DE DADOS 
+    const vehicleExist = await Vehicle.findById(id)
+
+    //VERIFICA SE O VEICULO ESTÁ CADASTRADO NO BANCO DE DADOS
+    if(!vehicleExist) {
+        //MOSTRA MENSAGE DE FEEDBACK PARA O USUÁRIO
+        return res.send({ type: "error", message: "Veículo não encontrado" })
+    } else {
+        //PROCURA PELO VEICULO NO BANCO DE DADOS E O ATUALIZA 
+        await Vehicle.findByIdAndUpdate(id, {
+            license_plate: license_plate ? license_plate : vehicleExist.license_plate
+        })
+        //MOSTRA MENSAGE DE FEEDBACK PARA O USUÁRIO
+        return res.send({ type: "success", message: `Veículo com a placa ${license_plate}, atualizado com sucesso!` })        
     }
 })
 
@@ -352,6 +407,37 @@ app.delete('/delete-order/:id', async (req, res) => {
         await Order.findByIdAndDelete(id)
         //MOSTRA MENSAGEM DE FEEDBACK PARAO USUÁRIO
         return res.send(`Pedido do cliente ${orderExist.name}, deletado com sucesso!`)
+    }
+})
+
+//ROTA PARA ATUALIZAR PEDIDOS  NO BANCO DE DADOS
+app.put('/update-order/:id', async (req, res) => {
+    //PEGA O ID DA PELA URL
+    const id = req.params.id
+
+    //PEGA OS DADOS ENVIADOS POR REQUISISAO PELO USUÁRIO
+    const location = req.body.location
+    const client = req.body.client
+    const clothes = req.body.clothes
+    const zone = req.body.zone
+    const description = req.body.description
+
+    //VARIAVEL DE CONTROLE PARA VER SE O PEDIDO EXISTE NO BANCO DE DADOS
+    const orderExist = await Order.findById(id)
+
+    if(!orderExist) {
+        //MOSTRA MENSAGEM DE ERRO PARA O USUÁRIO
+        return res.send({ "message": "Pedido não encontrado" })
+    }else {
+        await Order.findByIdAndUpdate(id, {
+            location: location ? location : orderExist.location,
+            client: client ? client : orderExist.client,
+            clothes: clothes ? clothes : orderExist.clothes,
+            zone: zone ? zone : orderExist.zone,
+            description: description ? description : orderExist.description
+        })
+        //MOSTRA MENSAGEM DE FEEDBACK PARAO USUÁRIO
+        return res.send({ "message": `Pedido do cliente ${client}, atualizado com sucesso!` })
     }
 })
 
