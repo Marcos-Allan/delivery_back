@@ -336,6 +336,23 @@ app.get('/orders', async (req, res) => {
     }
 })
 
+app.get('/get-order/:id', async (req, res) => {
+    //PEGA O ID DA PELA URL
+    const id = req.params.id
+
+    //BUSCA NO BANCO DE DADOS O PEDIDO COM O ID INFORMADO
+    const order = Order.findById(id)
+
+    //VERIFICA SE O PEDIDO COM O ID ESPECIFICADO FOI ENCONTRADO
+    if(order) {
+        //RETORNA MENSAGEM DE SUCESSO E O PEDIDO PARA O CLIENTE
+        res.send({ message: "Pedido encontrado!", order: order }) 
+    }else{
+        //RETORNA MENSAGEM DE ERRO PARA O CLIENTE
+        res.send({ message: "Pedido não encontrado" })
+    }
+})
+
 //ROTA PRA REGISTRAR PEDIDOS NO BANCO DE DADOS
 app.post('/register-order', async (req, res) => {
 
