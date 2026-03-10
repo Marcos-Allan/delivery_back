@@ -341,7 +341,7 @@ app.get('/get-order/:id', async (req, res) => {
     const id = req.params.id
 
     //BUSCA NO BANCO DE DADOS O PEDIDO COM O ID INFORMADO
-    const order = Order.findById(id)
+    const order = await Order.findById(id)
 
     //VERIFICA SE O PEDIDO COM O ID ESPECIFICADO FOI ENCONTRADO
     if(order) {
