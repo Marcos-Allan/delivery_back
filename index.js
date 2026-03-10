@@ -341,10 +341,12 @@ app.post('/register-order', async (req, res) => {
 
     //PEGA OS DADOS ENVIADOS POR REQUISISAO PELO USUÁRIO 
     const location = req.body.location
+    const address = req.body.address
     const client = req.body.client
     const clothes = req.body.clothes
     const zone = req.body.zone
     const description = req.body.description
+    const type_delivery = req.body.type_delivery
 
     //VERIFICA SE O USUÁRIO ENVIOU A LOCALIZAÇÃO DO PEDIDO
     if(!location) {
@@ -376,13 +378,27 @@ app.post('/register-order', async (req, res) => {
         return res.send("Informe a descrição do pedido")
     }
 
+    //VERIFICA SE O USUÁRIO ENVIOU O ENDERECO DO PEDIDO
+    if(!address) {
+        //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
+        return res.send("Informe o endereço do pedido")
+    }
+
+    //VERIFICA SE O USUÁRIO ENVIOU O TIPO DO PEDIDO
+    if(!type_delivery) {
+        //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
+        return res.send("Informe o tipo do pedido")
+    }
+    
     //CRIA UM NOVO PEDIDO NO BANCO DE DADOS
     const order = new Order({
         location: location,
+        address: address,
         client: client,
         clothes: clothes,
         zone: zone,
-        description: description
+        description: description,
+        type_delivery: type_delivery
     })
 
     //SALVA O NOVO PEDIDO NO BANCO DE DADOS
