@@ -133,6 +133,55 @@ app.get('/employees', async (req, res) => {
     }
 })
 
+// ROTA PARA LOGIN DE FUNCIONÁRIOS
+app.post('/login', async (req, res) => {
+    const name = req.body.name
+    const password = req.body.password
+
+    if (!name || !password) {
+        return res.status(400).send({ 
+            type: "error", 
+            message: "Por favor, preencha o nome e a senha." 
+        });
+    }
+
+    try {
+        const user = await Person.findOne({ name: name });
+
+        if (!user) {
+            return res.status(404).send({ 
+                type: "error", 
+                message: "Usuário não encontrado." 
+            });
+        }
+
+        // 4. Verifica se a senha coincide
+        if (user.password !== password) {
+            return res.status(401).send({ 
+                type: "error", 
+                message: "Senha incorreta." 
+            });
+        }
+
+        // 5. Login bem-sucedido
+        return res.send({
+            type: "success",
+            message: `Bem-vind${user.gender.toLowerCase() === "masculino" ? 'o' : 'a'}, ${user.name}!`,
+            user: {
+                id: user._id,
+                name: user.name,
+                position: user.position
+            }
+        });
+
+    } catch (error) {
+        return res.status(500).send({ 
+            type: "error", 
+            message: "Erro interno no servidor ao tentar logar." 
+        });
+    }
+});
+
 //ROTA PRA REGISTRAR USUÁRIOS NO BANCO DE DADOS
 app.post('/register-employee', async (req, res) => {
 
