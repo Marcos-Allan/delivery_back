@@ -139,7 +139,7 @@ app.post('/login', async (req, res) => {
     const password = req.body.password
 
     if (!name || !password) {
-        return res.status(400).send({ 
+        return res.send({ 
             type: "error", 
             message: "Por favor, preencha o nome e a senha." 
         });
@@ -149,7 +149,7 @@ app.post('/login', async (req, res) => {
         const user = await Person.findOne({ name: name });
 
         if (!user) {
-            return res.status(404).send({ 
+            return res.send({ 
                 type: "error", 
                 message: "Usuário não encontrado." 
             });
@@ -157,7 +157,7 @@ app.post('/login', async (req, res) => {
 
         // 4. Verifica se a senha coincide
         if (user.password !== password) {
-            return res.status(401).send({ 
+            return res.send({ 
                 type: "error", 
                 message: "Senha incorreta." 
             });
