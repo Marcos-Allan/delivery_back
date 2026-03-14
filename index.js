@@ -43,6 +43,10 @@ const Order = mongoose.model('Order', {
         type: String,
         required: true
     },
+    status: {
+        type: String,
+        required: true
+    },
     address: {
         type: String,
         required: true
@@ -113,6 +117,14 @@ const Vehicle = mongoose.model('Vehicle', {
     },
 });
 
+function capitalize(text) {
+    if (!text){
+        return ""
+    }else{
+        return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
+    } 
+}
+
 //ROTA DE TESTE PARA VER SE O SERVIDOR ESTÁ FUNCIONANDO
 app.get('/', async (req, res) => {
     return res.send('Teste de rota, rota funcionando!')
@@ -155,7 +167,6 @@ app.post('/login', async (req, res) => {
             });
         }
 
-        // 4. Verifica se a senha coincide
         if (user.password !== password) {
             return res.send({ 
                 type: "error", 
@@ -163,10 +174,9 @@ app.post('/login', async (req, res) => {
             });
         }
 
-        // 5. Login bem-sucedido
         return res.send({
             type: "success",
-            message: `Bem-vind${user.gender.toLowerCase() === "masculino" ? 'o' : 'a'}, ${user.name}!`,
+            message: `Bem-vind${user.gender.toLowerCase() === "masculino" ? 'o' : 'a'}, ${capitalize(user.name)}!`,
             user: {
                 id: user._id,
                 name: user.name,
@@ -215,7 +225,7 @@ app.post('/register-employee', async (req, res) => {
     //VERIFICA SE personExist É TRUE, SE FOR RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO, SE NÃO FOR CRIA UM NOVO USUÁRIO NO BANCO DE DADOS
     if(personExist) {
         //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-        return res.send({ type: "error", message: "Funcionário já cadastrado" })
+        return res.send({ type: "error", message: `Funcionári${String(gender).toLowerCase() === "masculino"  ? 'o' : 'a'} já cadastrado` })
     }else {
         //CRIA UM NOVO FUNCIONNÁRIO NO BANCO DE DADOS
         const person = new Person({
@@ -229,7 +239,7 @@ app.post('/register-employee', async (req, res) => {
         await person.save()
 
         //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-        return res.send({ type: "success", message: `Funcionári${String(gender).toLowerCase() === "masculino"  ? 'o' : 'a'} ${name}, cadastrado com sucesso!` })
+        return res.send({ type: "success", message: `Funcionári${String(gender).toLowerCase() === "masculino"  ? 'o' : 'a'} ${capitalize(name)}, cadastrado com sucesso!` })
     }
 })
 
@@ -244,7 +254,7 @@ app.delete('/delete-employee/:id', async (req, res ) => {
     //VERIFICA SE personExist É VERDDADEIRO  OU FALSO
     if(!personExist) {
         //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-        return res.send({ type: "error", message: "Funcionário não encontrado" })
+        return res.send({ type: "error", message: `Funcionário não encontrado` })
     } else {
         //DELETA O USUÁRIO DO BANCO DE DADOS
         await Person.findByIdAndDelete(id)
@@ -270,7 +280,7 @@ app.put('/update-employee/:id', async (req, res) => {
     //VERIFICA SE personExist É VERDDADEIRO  OU FALSO
     if(!personExist) {
         //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-        return res.send({ type: "error", message: "Funcionário não encontrado" })
+        return res.send({ type: "error", message: `Funcionári${String(personExist.gender).toLowerCase() === "masculino" ? 'o' : 'a'} não encontrado` })
     } else {
         //ATUALIZA O USUÁRIO DO BANCO DE DADOS
         await Person.findByIdAndUpdate(id, {
@@ -420,6 +430,7 @@ app.post('/register-order', async (req, res) => {
     const zone = req.body.zone
     const description = req.body.description
     const type_delivery = req.body.type_delivery
+    const status = req.body.status ? req.body.status : 'pending'
 
     //VERIFICA SE O USUÁRIO ENVIOU A LOCALIZAÇÃO DO PEDIDO
     if(!location) {
@@ -466,6 +477,7 @@ app.post('/register-order', async (req, res) => {
     //CRIA UM NOVO PEDIDO NO BANCO DE DADOS
     const order = new Order({
         location: location,
+        status: status,
         address: address,
         client: client,
         clothes: clothes,
