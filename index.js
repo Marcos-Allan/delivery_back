@@ -45,7 +45,8 @@ const Order = mongoose.model('Order', {
     },
     status: {
         type: String,
-        required: true
+        required: true,
+        default: 'pending'
     },
     address: {
         type: String,
@@ -260,7 +261,7 @@ app.delete('/delete-employee/:id', async (req, res ) => {
         await Person.findByIdAndDelete(id)
 
         //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-        return res.send({ type: "success", message: `Funcionári${String(personExist.gender).toLowerCase() === "masculino" ? 'o' : 'a'} ${personExist.name} deletado com sucesso!` })   
+        return res.send({ type: "success", message: `Funcionári${String(personExist.gender).toLowerCase() === "masculino" ? 'o' : 'a'} ${capitalize(personExist.name)} deletado com sucesso!` })   
     }
 })
 
@@ -273,6 +274,7 @@ app.put('/update-employee/:id', async (req, res) => {
     const name = req.body.name
     const position = req.body.position
     const gender = req.body.gender
+    const password = req.body.password
 
     //VERIFICASE A PESSOA EXISTENO BANCO DE DADOS
     const personExist = await Person.findById(id)
@@ -286,11 +288,12 @@ app.put('/update-employee/:id', async (req, res) => {
         await Person.findByIdAndUpdate(id, {
             name: name ? name : personExist.name,
             position: position ? position : personExist.position,
-            gender: gender ? gender : personExist.gender
+            gender: gender ? gender : personExist.gender,
+            password: password ? password : personExist.password
         })
 
         //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-        return res.send({ type: "success", message: `Funcionári${String(gender).toLowerCase() === "masculino" ? 'o' : 'a'} ${name} atualizado com sucesso!` })
+        return res.send({ type: "success", message: `Funcionári${String(gender).toLowerCase() === "masculino" ? 'o' : 'a'} ${capitalize(name)} atualizado com sucesso!` })
     }
 })
 
