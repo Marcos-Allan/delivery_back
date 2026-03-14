@@ -29,6 +29,11 @@ const Person = mongoose.model(' Person', {
     gender: {
         type: String,
         required: true
+    },
+    password: {
+        type: String,
+        required: true,
+        default: '12345'
     }
 });
 
@@ -135,6 +140,7 @@ app.post('/register-employee', async (req, res) => {
     const name = req.body.name
     const position = req.body.position
     const gender = req.body.gender
+    const password = req.body.password
 
     //VERIFICA SE O USUÁRIO ENVIOU O NOME DO FUNCIONÁRIO
     if(!name) {
@@ -166,7 +172,8 @@ app.post('/register-employee', async (req, res) => {
         const person = new Person({
             name: name,
             position: position,
-            gender: gender
+            gender: gender,
+            password: password ? password : '12345'
         })
 
         //SALVA O NOVO FUNCIONÁRIO NO BANCO DE DADOS
