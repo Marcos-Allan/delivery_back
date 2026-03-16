@@ -3,15 +3,15 @@ const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
 
-//INICIA AS VARIAVEIS DE AMBIENTE PARA SDEGURANCA DA APLICACAO
+//INICIA AS VARIAVEIS DE AMBIENTE PARA SEGURANCA DA APLICACAO
 require('dotenv').config()
 
-//CONFIGURAÇÃO DA APLICAÇÃO
+//CONFIGURAÇÃO DA APLICACAO
 const app = express()
 app.use(express.json())
 app.use(cors())
 
-//CONFIGURALÇOES DO MONGODB
+//CONFIGURACOES DO MONGODB
 const user_name = process.env.USER_NAME
 const password = process.env.PASSWORD
 const port = process.env.PORT || 3000
@@ -118,16 +118,21 @@ const Vehicle = mongoose.model('Vehicle', {
     },
 });
 
+//FUNCAO RESPONSAVEL POR DEIXAR O TEXTO COM A PRIMEIRA LETRA EM MINUSCULA E O RESTANTE DA PALAVRA EM MINUSCULO
 function capitalize(text) {
+    //VERIFICA SE FOI PASSADO O TEXTO OU NAO
     if (!text){
+        //RETORNA O TEXTO VAZIO
         return ""
     }else{
+        //FAZ A CONFIGURACAO PARA DEIXAR A PRIMEIRA LETRA EM MINUSCULA E O RESTANTE DA PALAVRA EM MINUSCULO
         return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
     } 
 }
 
 //ROTA DE TESTE PARA VER SE O SERVIDOR ESTÁ FUNCIONANDO
 app.get('/', async (req, res) => {
+    //RETORNA MENSAGEM PARA O FEEDBACK DO USUARIO
     return res.send('Teste de rota, rota funcionando!')
 })
 
@@ -146,48 +151,68 @@ app.get('/employees', async (req, res) => {
     }
 })
 
-// ROTA PARA LOGIN DE FUNCIONÁRIOS
+//ROTA PARA LOGIN DE FUNCIONÁRIOS
 app.post('/login', async (req, res) => {
+    //PEGA OS DADOS DO CORPO DA REQUISIÇÃO
     const name = req.body.name
     const password = req.body.password
 
-    if (!name || !password) {
+    //VERIFICA SE O NOME FOI PASSADO
+    if (!name) {
+        //RETORNA MENSAGEM DE ERRO PARA O FEEDBACK DO USUARIO
         return res.send({ 
             type: "error", 
-            message: "Por favor, preencha o nome e a senha." 
+            message: "Por favor, preencha o nome" 
+        });
+    }
+    
+    //VERIFICA SE A SENHA FOI PASSADA
+    if (!password) {
+        //RETORNA MENSAGEM DE ERRO PARA O FEEDBACK DO USUARIO
+        return res.send({ 
+            type: "error", 
+            message: "Por favor, preencha a senha." 
         });
     }
 
     try {
+        //PROCURA UM USUARIO COM O NOME PASSADO PELA REQUISICAO
         const user = await Person.findOne({ name: name });
 
+        //VERIFICA SE TEM USUARIO
         if (!user) {
+            //RETORNA MENSAGEM DE ERRO PARA O FEEDBACK DO USUARIO
             return res.send({ 
                 type: "error", 
                 message: "Usuário não encontrado." 
             });
         }
-
+        
+        //VERIFICA SE A SENHA DO USUARIO É IGUAL A CADASTRADA NO BANCO DE DADOS
         if (user.password !== password) {
+            //RETORNA MENSAGEM DE ERRO PARA O FEEDBACK DO USUARIO
             return res.send({ 
                 type: "error", 
                 message: "Senha incorreta." 
             });
         }
-
+        
+        //RETORNA MENSAGEM DE SUCESSO PARA O FEEDBACK DO USUARIO
         return res.send({
             type: "success",
             message: `Bem-vind${user.gender.toLowerCase() === "masculino" ? 'o' : 'a'}, ${capitalize(user.name)}!`,
             user: {
                 id: user._id,
                 name: user.name,
-                position: user.position
+                position: user.position,
+                gender: user.gender,
             }
         });
 
     } catch (error) {
-        return res.status(500).send({ 
-            type: "error", 
+        //RETORNA MENSAGEM DE ERRO PARA O FEEDBACK DO USUARIO
+        return res.status(500).send({
+            type: "error",
             message: "Erro interno no servidor ao tentar logar." 
         });
     }
@@ -405,6 +430,7 @@ app.get('/orders', async (req, res) => {
     }
 })
 
+//ROTA PARA LISTAR PEDIDO ESPECIFICO POR ID
 app.get('/get-order/:id', async (req, res) => {
     //PEGA O ID DA PELA URL
     const id = req.params.id
@@ -587,9 +613,7 @@ app.post('/register-invoice', async (req, res) => {
     await invoice.save()
 
     //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-    return res.send(`Nota fisca
-        
-        l do cliente ${delivery_person_name}, cadastrada com sucesso!`)
+    return res.send(`Nota fiscal do cliente ${delivery_person_name}, cadastrada com sucesso!`)
 })
 
 //ROTA PARA DELETAR AS ENTREGAS DO BANCO DE DADOS
@@ -600,11 +624,16 @@ app.delete('/delete-invoice/:id', async (req, res) => {
     //VARIAVEL DE CONTROLE PARA VER SE A NOTA FISCAL EXISTE NO BANCO DE DADOS
     const invoiceExist = await Invoice.findById(id)
 
+    //VERIFICA SE EXISTE A NOTA FISCAL
     if(!invoiceExist) {
+        //RETORNA MENSAGEM DE ERRO PARA O FEEDBACK DO USUÁRIO
         return res.json("Nota fiscal não encontrada!")
     }  else {
+        //DELETA O PEDIDO PELO BANCO DE DADOS
         await Invoice.findByIdAndDelete(id)
-        return res.json(`Nota fiscal do  cliente ${invoiceExist.delivery_person_name}, deletada xom sucessso!!!`)
+        
+        //RETORNA MENSAGEM DE SUCESSO PARA O FEEDBACK DOO USUARIO
+        return res.json(`Nota fiscal do  cliente ${invoiceExist.delivery_person_name}, deletada Com sucessso!!!`)
     }
   
 })
@@ -612,14 +641,19 @@ app.delete('/delete-invoice/:id', async (req, res) => {
 //FAZ A CONEXAO COM O BANCO DE DADOS E INICIA O SERVIDOR 
 mongoose.connect(`mongodb+srv://${user_name}:${password}@cluster0.lflwc8k.mongodb.net/?appName=Cluster0`)
 .then(() => {
+    //ESCREVE NO CONSOLE QUE O SISTEMA DE BANCO DE DADOS CONSEGUIU ESTABELECER CONEXAO COM A API
     console.log("✅ Conectado ao servidor (MongoDB)")
 
+    //ESCREEVE NO CONSOLE EM QUAL PORTA O SERVIDOR ESTÁ RODANDO
     app.listen(port, () => {
-    console.log(`🚀 Servidor rodando na porta ${port}`)
+        console.log(`🚀 Servidor rodando na porta ${port}`)
     })
 })
 
 .catch((error) => {
+    //ESCREVE NO CONSOLE MENSAGEM DE ERRO PARA FEEDBACK DO USUARIO
     console.error("Erro ao tentar se conectar ao MongoDB")
+
+    //ESCREVE O ERRO NO CONSOLE
     console.error(error)
 })
