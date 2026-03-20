@@ -450,77 +450,40 @@ app.get('/get-order/:id', async (req, res) => {
 
 //ROTA PRA REGISTRAR PEDIDOS NO BANCO DE DADOS
 app.post('/register-order', async (req, res) => {
+    try {
+        //PEGA OS DADOS DO CORPO DA REQUISIÇÃO
+        const { location, address, client, clothes, zone, description, type_delivery } = req.body;
+        const status = req.body.status || 'pending';
 
-    //PEGA OS DADOS ENVIADOS POR REQUISISAO PELO USUÁRIO 
-    const location = req.body.location
-    const address = req.body.address
-    const client = req.body.client
-    const clothes = req.body.clothes
-    const zone = req.body.zone
-    const description = req.body.description
-    const type_delivery = req.body.type_delivery
-    const status = req.body.status ? req.body.status : 'pending'
+        // VALIDAÇÕES ESSENCIAIS
+        if (!location) return res.send("Informe a localização");
+        if (!client) return res.send("Informe o nome do cliente");
+        if (!clothes) return res.send("Informe as roupas");
+        if (!address) return res.send("Informe o endereço");
 
-    //VERIFICA SE O USUÁRIO ENVIOU A LOCALIZAÇÃO DO PEDIDO
-    if(!location) {
+        //CRIA UM NOVO REGISTRO DE PEDIDO
+        const order = new Order({
+            location,
+            status,
+            address,
+            client,
+            clothes, 
+            zone,
+            description: description || "Sem descrição geral",
+            type_delivery
+        });
+
+        //SALVA NO BANCO DE DADOS O PEDIDO CRIADO
+        await order.save();
+
         //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-        return res.send("Informe a localização do pedido")
-    }
-
-    //VERIFICA SE O USUÁRIO ENVIOU O NOME DO CLIENTE DO PEDIDO
-    if(!client) {
+        return res.json({ message: `Pedido do cliente ${client} cadastrado com sucesso!`, order });
+        
+    } catch (error) {
         //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-        return res.send("Informe o nome do cliente do pedido")
+        return res.send({ type: 'error', message: "Erro interno ao salvar pedido" });
     }
-
-    //VERIFICA SE O USUÁRIO ENVIOU AS ROUPAS DO PEDIDO
-    if(!clothes) {
-        //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-        return res.send("Informe as roupas do pedido")
-    }
-
-    //VERIFICA SE O USUÁRIO ENVIOU A ZONA DE ENTREGA DO PEDIDO
-    if(!zone) {
-        //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-        return res.send("Informe a zona de entrega do pedido")
-    }
-
-    //VERIFICA SE O USUÁRIO ENVIOU A DESCRIÇÃO DO PEDIDO
-    if(!description) {
-        //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-        return res.send("Informe a descrição do pedido")
-    }
-
-    //VERIFICA SE O USUÁRIO ENVIOU O ENDERECO DO PEDIDO
-    if(!address) {
-        //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-        return res.send("Informe o endereço do pedido")
-    }
-
-    //VERIFICA SE O USUÁRIO ENVIOU O TIPO DO PEDIDO
-    if(!type_delivery) {
-        //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-        return res.send("Informe o tipo do pedido")
-    }
-    
-    //CRIA UM NOVO PEDIDO NO BANCO DE DADOS
-    const order = new Order({
-        location: location,
-        status: status,
-        address: address,
-        client: client,
-        clothes: clothes,
-        zone: zone,
-        description: description,
-        type_delivery: type_delivery
-    })
-
-    //SALVA O NOVO PEDIDO NO BANCO DE DADOS
-    await order.save()
-
-    //RETORNA MENSAGEM DE FEEDBACK PARA O USUÁRIO
-    return res.send(`Pedido do cliente ${client}, cadastrado com sucesso!`)
-})
+});
 
 //ROTA PARA DELETAR PEDIDOS  NO BANCO DE DADOS
 app.delete('/delete-order/:id', async (req, res) => {
