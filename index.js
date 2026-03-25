@@ -26,21 +26,20 @@ cloudinary.config({
 
 // ROTA DE EXCLUSÃO
 app.delete('/delete-image', async (req, res) => {
-    // Usar query em vez de params evita problemas com barras no ID
-    const { public_id } = req.query; 
+    // Tenta pegar o ID de todas as formas possíveis
+    const public_id = req.query.public_id || req.body.public_id;
 
     if (!public_id) {
-        return res.status(400).json({ message: "ID não fornecido" });
+        return res.status(400).json({ error: "Faltou o public_id" });
     }
 
     try {
         const result = await cloudinary.uploader.destroy(public_id);
-        res.status(200).json(result);
+        return res.status(200).json(result); 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Falha interna no Cloudinary" });
+        return res.status(500).json({ error: error.message });
     }
-});
+});;
 
 //MODELO DO OBJETO DO BANCO DE DADOS
 const Person = mongoose.model(' Person', {
