@@ -20,8 +20,10 @@ const port = process.env.PORT || 3000
 //CONFIGURAÇÃO DO CLOUDINARY
 cloudinary.config({ 
   cloud_name: 'dgvxpeu0a', 
-  api_key: '388439499831778', 
-  api_secret: 'Z98DkX7_S6-N8H9oKkXz8L-S8pI' 
+  // ESTA É A CHAVE QUE ESTÁ NO SEU PRINT NA COLUNA "ID"
+  api_key: '1bca3721b05609caffe63d15de201d', 
+  // VOCÊ PRECISA PEGAR O SECRET DESSA CHAVE ESPECÍFICA NO PAINEL
+  api_secret: 'COLOQUE_O_SECRET_DESTA_CHAVE_AQUI' 
 });
 
 // ROTA DE EXCLUSÃO
