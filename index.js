@@ -1,6 +1,7 @@
 //IMPORTAÇÃO DAS BOBLIOTECAS
 const express = require('express')
 const mongoose = require('mongoose')
+const cloudinary = require('cloudinary').v2;
 const cors = require('cors')
 
 //INICIA AS VARIAVEIS DE AMBIENTE PARA SEGURANCA DA APLICACAO
@@ -15,6 +16,32 @@ app.use(cors())
 const user_name = process.env.USER_NAME
 const password = process.env.PASSWORD
 const port = process.env.PORT || 3000
+
+//CONFIGURAÇÃO DO CLOUDINARY
+cloudinary.config({ 
+  cloud_name: 'dgvxpeu0a', 
+  api_key: '388439499831778', 
+  api_secret: 'Z98DkX7_S6-N8H9oKkXz8L-S8pI' 
+});
+
+// ROTA DE EXCLUSÃO
+app.delete('/delete-image/:public_id', async (req, res) => {
+    const { public_id } = req.params;
+
+    try {
+        // O SDK do Cloudinary faz todo o trabalho de assinatura e MD5 sozinho!
+        const result = await cloudinary.uploader.destroy(public_id);
+        
+        if (result.result === 'ok') {
+            return res.json({ message: "Foto apagada com sucesso", result: "ok" });
+        } else {
+            return res.json({ message: "Erro ao apagar: " + result.result });
+        }
+    } catch (error) {
+        console.error("Erro no Cloudinary:", error);
+        return res.status(500).json({ error: "Erro interno no servidor" });
+    }
+})
 
 //MODELO DO OBJETO DO BANCO DE DADOS
 const Person = mongoose.model(' Person', {
