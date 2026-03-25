@@ -20,11 +20,11 @@ const port = process.env.PORT || 3000
 //CONFIGURAÇÃO DO CLOUDINARY
 cloudinary.config({ 
   cloud_name: 'dgvxpeu0a', 
-  // ESTA É A CHAVE QUE ESTÁ NO SEU PRINT NA COLUNA "ID"
-  api_key: '1bca3721b05609caffe63d15de201d', 
-  // VOCÊ PRECISA PEGAR O SECRET DESSA CHAVE ESPECÍFICA NO PAINEL
-  api_secret: 'COLOQUE_O_SECRET_DESTA_CHAVE_AQUI' 
-});
+  // CHAVE DA COLUNA "API KEY" DO SEU PRINT
+  api_key: '628575898193681', 
+  // O SECRET DESSA CHAVE ESPECÍFICA (O que termina em tiz7U)
+  api_secret: 'xx8e80fMbSZYwTjxJn715-tiz7U' 
+});;
 
 // ROTA DE EXCLUSÃO
 app.delete('/delete-image', async (req, res) => {
