@@ -26,20 +26,50 @@ cloudinary.config({
   api_secret: 'xx8e80fMbSZYwTjxJn715-tiz7U' 
 });;
 
-// ROTA DE EXCLUSÃO
-app.delete('/delete-image', async (req, res) => {
-    // Tenta pegar o ID de todas as formas possíveis
-    const public_id = req.query.public_id || req.body.public_id;
-
-    if (!public_id) {
-        return res.status(400).json({ error: "Faltou o public_id" });
-    }
-
+// ROTA DE EXCLUSÃO DAS IMAGENS DO CLOUDNARY
+app.delete('/delete-photo/:id', async (req, res) => {
     try {
-        const result = await cloudinary.uploader.destroy(public_id);
-        return res.status(200).json(result); 
+        const { id } = req.params; // Pega o ID do MongoDB
+
+        // 1. Busca no Banco para pegar o public_id que o Cloudinary precisa
+        const photo = await Photo.findById(id);
+
+        if (!photo) {
+            return res.status(404).json({ error: "Foto não encontrada no banco." });
+        }
+
+        // 2. Comando para o Cloudinary apagar o arquivo físico
+        await cloudinary.uploader.destroy(photo.public_id);
+
+        // 3. Comando para o MongoDB apagar o registro
+        await Photo.findByIdAndDelete(id);
+
+        return res.status(200).json({ message: "Limpeza completa realizada!" });
+
     } catch (error) {
         return res.status(500).json({ error: error.message });
+    }
+});
+
+// Rota para salvar a referência da foto no Banco
+app.post('/register-photo', async (req, res) => {
+    try {
+        const { name, public_id, url } = req.body;
+        const photo = new Photo({ name, public_id, url });
+        await photo.save();
+        res.status(201).json(photo);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Rota para listar (O Front vai usar esta agora!)
+app.get('/get-photos', async (req, res) => {
+    try {
+        const photos = await Photo.find().sort({ createdAt: -1 });
+        res.json(photos);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 });;
 
@@ -99,6 +129,14 @@ const Order = mongoose.model('Order', {
         type: String,
         required: true
     }
+});
+
+//MODELO DO OBJETO DO BANCO DE DADOS
+const Photo = mongoose.model('Photo', {
+    name: { type: String, required: true },
+    public_id: { type: String, required: true },
+    url: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now }
 });
 
 //MODELO DO OBJETO DO BANCO DE DADOS
